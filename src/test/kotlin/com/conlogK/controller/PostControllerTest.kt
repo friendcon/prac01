@@ -55,14 +55,11 @@ class PostControllerTest(
     fun test3() {
         mockMvc.perform(MockMvcRequestBuilders.post("/post")
             .contentType(MediaType.APPLICATION_JSON)
-            /*.content(
-                "{\"title\" : \"\", \"content\" : \"내용입니다.\"}"
-            )*/
             .content(
-                "{\"title\" : null, \"content\" : \"내용입니다.\"}"
+                "{\"title\" : null , \"content\" : \"내용입니다.\"}"
             )
         )
-            .andExpect(status().is4xxClientError)
+            .andExpect(status().isBadRequest)
             .andDo(MockMvcResultHandlers.print())
     }
 }
