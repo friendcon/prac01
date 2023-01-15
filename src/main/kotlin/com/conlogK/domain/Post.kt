@@ -11,7 +11,15 @@ data class Post(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val title: String,
+    var title: String,
     @Lob // DB에서 LongText 형태로 생성되도록 함
     val content: String
-)
+) {
+    // 서비스의 정책을 엔티티에 넣지 말고 서비스 정책에 맞는 응답 클래스를 만들거라
+    /*fun getSubTitle(): String {
+        return title.substring(0, 10)
+    }*/
+    fun getSubStrTitle(): String {
+        return title.substring(0, 10)
+    }
+}

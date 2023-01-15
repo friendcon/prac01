@@ -1,6 +1,7 @@
 package com.conlogK.service
 
 import com.conlogK.controller.request.PostCreate
+import com.conlogK.controller.response.PostResponse
 import com.conlogK.domain.Post
 import com.conlogK.repository.PostRepository
 import org.slf4j.LoggerFactory
@@ -27,8 +28,17 @@ class PostService(
         postRepository.save(post)
     }
 
-    fun getPost(postId: Long): Post {
+    fun getPost(postId: Long): PostResponse {
         val post = postRepository.findById(postId).orElseThrow { throw IllegalArgumentException("존재하지 않는 글 입니다") }
-        return post
+
+        return post.toResponse(post.getSubStrTitle())
+    }
+
+    fun Post.toResponse(subStringTitle: String): PostResponse {
+        return PostResponse(
+            id = id!!,
+            title = subStringTitle,
+            content = content
+        )
     }
 }

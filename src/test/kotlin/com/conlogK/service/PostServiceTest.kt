@@ -45,7 +45,7 @@ class PostServiceTest(
     fun postReadTest() {
         // given
         val postCreate = PostCreate(
-            title = "제목이여요",
+            title = "123456789012345",
             content = "본문이여요"
         )
 
@@ -59,7 +59,7 @@ class PostServiceTest(
         // then
         assertNotNull(post)
         assertEquals(1L, postRepository.count())
-        assertEquals("제목이여요", post.title)
+        assertEquals("1234567890", post.title)
         assertEquals("본문이여요", post.content)
     }
 }

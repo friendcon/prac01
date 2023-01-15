@@ -109,10 +109,13 @@ class PostControllerTest(
     fun test05() {
         // given
         val postCreate = Post(
-            title = "글 제목이여요",
+            title = "123456789012345",
             content = "글 내용이여요"
         )
 
+        /**
+         * 클라이언트 요청 : 글 제목 10글자만 보내줘
+         */
         val response = postRepository.save(postCreate)
 
         val boardId = 1L
@@ -123,7 +126,7 @@ class PostControllerTest(
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(boardId))
-            .andExpect(jsonPath("$.title").value(postCreate.title))
+            .andExpect(jsonPath("$.title").value("1234567890"))
             .andExpect(jsonPath("$.content").value(postCreate.content))
             .andDo(print())
 
