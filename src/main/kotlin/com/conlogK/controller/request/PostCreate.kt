@@ -7,4 +7,11 @@ data class PostCreate(
     val title: String,
     @field:NotBlank(message = "내용을 입력해주세요")
     val content: String
-)
+) {
+    fun changeTitle(title: String): PostCreate{
+        return PostCreate(
+            title = title,
+            content = content
+        )
+    }
+}
