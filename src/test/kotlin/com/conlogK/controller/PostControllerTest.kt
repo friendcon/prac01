@@ -1,7 +1,9 @@
 package com.conlogK.controller
 
 import com.conlogK.controller.request.PostCreate
+import com.conlogK.domain.Post
 import com.conlogK.repository.PostRepository
+import com.conlogK.service.PostService
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -14,8 +16,8 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
+import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 //@WebMvcTest // MockMvc 주입
@@ -23,23 +25,13 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 @AutoConfigureMockMvc
 class PostControllerTest(
     @Autowired val mockMvc: MockMvc,
+    @Autowired val postService: PostService,
     @Autowired val postRepository: PostRepository,
     @Autowired val objectMapper: ObjectMapper
 ) {
     @BeforeEach
     fun clean() {
         postRepository.deleteAll();
-    }
-
-    @Test
-    @DisplayName("/posts 요청시 Hello 출력")
-    fun test() {
-
-        // Expected
-        mockMvc.perform(MockMvcRequestBuilders.get("/posts"))
-            .andExpect(status().isOk)
-            .andExpect(MockMvcResultMatchers.content().string("hello"))
-            .andDo(MockMvcResultHandlers.print()) // contents 요약
     }
 
     @Test
@@ -63,7 +55,7 @@ class PostControllerTest(
                 )
             )
             .andExpect(status().isOk)
-            .andDo(MockMvcResultHandlers.print())
+            .andDo(print())
     }
 
     @Test
@@ -76,7 +68,7 @@ class PostControllerTest(
             )
         )
             .andExpect(status().isBadRequest)
-            .andDo(MockMvcResultHandlers.print())
+            .andDo(print())
     }
 
     /**
@@ -103,12 +95,38 @@ class PostControllerTest(
             )
         )
             .andExpect(status().isOk)
-            .andDo(MockMvcResultHandlers.print())
+            .andDo(print())
 
         Assertions.assertEquals(1L, postRepository.count())
 
         val post = postRepository.findAll().get(0)
         assertEquals("제목이여요",post.title)
         assertEquals("내용이여요",post.content)
+    }
+
+    @Test
+    @DisplayName("게시글 한개 조회")
+    fun test05() {
+        // given
+        val postCreate = Post(
+            title = "글 제목이여요",
+            content = "글 내용이여요"
+        )
+
+        val response = postRepository.save(postCreate)
+
+        val boardId = 1L
+
+        // when + then
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts/${boardId}")
+            .contentType(APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.id").value(boardId))
+            .andExpect(jsonPath("$.title").value(postCreate.title))
+            .andExpect(jsonPath("$.content").value(postCreate.content))
+            .andDo(print())
+
+        // expected
     }
 }

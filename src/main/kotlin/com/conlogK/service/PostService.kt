@@ -26,4 +26,9 @@ class PostService(
         )
         postRepository.save(post)
     }
+
+    fun getPost(postId: Long): Post {
+        val post = postRepository.findById(postId).orElseThrow { throw IllegalArgumentException("존재하지 않는 글 입니다") }
+        return post
+    }
 }
