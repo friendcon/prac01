@@ -5,6 +5,7 @@ import com.conlogK.domain.Post
 import com.conlogK.repository.PostRepository
 import com.conlogK.service.PostService
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.hamcrest.Matchers
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.BeforeEach
@@ -116,7 +117,7 @@ class PostControllerTest(
         /**
          * 클라이언트 요청 : 글 제목 10글자만 보내줘
          */
-        val response = postRepository.save(postCreate)
+        postRepository.save(postCreate)
 
         val boardId = 1L
 
@@ -126,10 +127,40 @@ class PostControllerTest(
         )
             .andExpect(status().isOk)
             .andExpect(jsonPath("$.id").value(boardId))
-            .andExpect(jsonPath("$.title").value("1234567890"))
+            .andExpect(jsonPath("$.title").value("123456789012345"))
             .andExpect(jsonPath("$.content").value(postCreate.content))
             .andDo(print())
 
         // expected
+    }
+
+    @Test
+    @DisplayName("게시글 리스트 조회")
+    fun test06() {
+        val post = Post(
+            title = "ㅎㅇ 안녕하세요zzzz",
+            content = "ㅎㅇ 안녕히가세요zz"
+        )
+        val post2 = Post(
+            title = "ㅎㅇ 안녕하세요zzzADSz",
+            content = "ㅎㅇ 안녕히가세요zz"
+        )
+
+        postRepository.saveAll(mutableListOf(post2, post))
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts")
+            .contentType(APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+                // 배열 요소 테스트를 위한 것
+            .andExpect(jsonPath("$.length()", Matchers.`is`(2)))
+            .andExpect(jsonPath("$[0].id").value(post2.id))
+            .andExpect(jsonPath("$[0].content").value(post2.content))
+            .andExpect(jsonPath("$[1].id").value(post.id))
+            .andExpect(jsonPath("$[1].content").value(post.content))
+            .andDo(print())
+
+        Assertions.assertEquals(2L, postRepository.count())
+
     }
 }

@@ -31,14 +31,18 @@ class PostService(
     fun getPost(postId: Long): PostResponse {
         val post = postRepository.findById(postId).orElseThrow { throw IllegalArgumentException("존재하지 않는 글 입니다") }
 
-        return post.toResponse(post.getSubStrTitle())
+        return post.toResponse()
     }
 
-    fun Post.toResponse(subStringTitle: String): PostResponse {
+    fun Post.toResponse(): PostResponse {
         return PostResponse(
             id = id!!,
-            title = subStringTitle,
+            title = title,
             content = content
         )
+    }
+
+    fun getPosts(): List<PostResponse> {
+        return postRepository.findAll().map { it.toResponse() }
     }
 }

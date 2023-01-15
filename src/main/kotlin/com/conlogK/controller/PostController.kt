@@ -27,4 +27,9 @@ class PostController(
         val post = postService.getPost(postId)
         return post
     }
+
+    @GetMapping("/posts")
+    fun getPosts(): List<PostResponse>{
+        return postService.getPosts()
+    }
 }
