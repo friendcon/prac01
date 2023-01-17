@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
 //@WebMvcTest // MockMvc 주입
 @SpringBootTest
@@ -162,5 +164,27 @@ class PostControllerTest(
 
         Assertions.assertEquals(2L, postRepository.count())
 
+    }
+
+    @Test
+    @DisplayName("글 여러개 조회 paging")
+    fun test07() {
+        val pageRequest = IntStream.range(1, 31)
+            .mapToObj { it ->
+                Post(
+                    title = "제목 : $it",
+                    content = "내용 : $it"
+                )
+            }.collect(Collectors.toList())
+
+
+        postRepository.saveAll(pageRequest)
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/posts?page=1&sort=id,desc")
+            .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$[0].id").value(30))
+            .andExpect(jsonPath("$[0].title").value("제목 : 30"))
+            .andDo(print())
     }
 }

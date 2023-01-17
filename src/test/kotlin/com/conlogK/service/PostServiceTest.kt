@@ -3,7 +3,6 @@ package com.conlogK.service
 import com.conlogK.controller.request.PostCreate
 import com.conlogK.domain.Post
 import com.conlogK.repository.PostRepository
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
@@ -11,6 +10,10 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
+import java.util.stream.Collectors
+import java.util.stream.IntStream
 
 @SpringBootTest
 class PostServiceTest(
@@ -65,19 +68,27 @@ class PostServiceTest(
         assertEquals("본문이여요", post.content)
     }
     @Test
-    @DisplayName("게시글 리스트 조회")
+    @DisplayName("게시글 리스트 1페이지 조회")
     fun postList() {
-        val post = Post(
-            title = "hellohellohellohello",
-            content="bye"
-        )
-        val post2 = Post(
-            title = "hello2hello2hello2hello2",
-            content="bye2"
-        )
-        postRepository.saveAll(mutableListOf(post2, post))
-        val response = postService.getPosts()
+        val requestPosts = IntStream.range(0, 29)
+            .mapToObj {
+                Post(
+                    title = "제목 : $it",
+                    content = "내용 : $it"
+                )
+            }
+            .collect(Collectors.toList())
 
-        Assertions.assertEquals(2L, postRepository.count())
+        postRepository.saveAll(requestPosts)
+
+        val pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id")
+
+        val post = postService.getPosts(pageable)
+        val get = post.toList().get(1)
+        val get2 = post.toList().get(4)
+        assertEquals(5L, post.size.toLong())
+        assertEquals("제목 : 27", get.title)
+        assertEquals("제목 : 24", get2.title)
+
     }
 }

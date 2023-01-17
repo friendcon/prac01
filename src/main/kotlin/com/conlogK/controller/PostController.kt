@@ -4,6 +4,8 @@ import com.conlogK.controller.request.PostCreate
 import com.conlogK.controller.response.PostResponse
 import com.conlogK.service.PostService
 import org.slf4j.LoggerFactory
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
 
@@ -29,7 +31,9 @@ class PostController(
     }
 
     @GetMapping("/posts")
-    fun getPosts(): List<PostResponse>{
-        return postService.getPosts()
+    fun getPosts(
+        pageable: Pageable
+    ): Page<PostResponse>{
+        return postService.getPosts(pageable)
     }
 }

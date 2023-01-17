@@ -6,6 +6,8 @@ import com.conlogK.domain.Post
 import com.conlogK.repository.PostRepository
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 
 
@@ -42,7 +44,7 @@ class PostService(
         )
     }
 
-    fun getPosts(): List<PostResponse> {
-        return postRepository.findAll().map { it.toResponse() }
+    fun getPosts(page: Pageable): Page<PostResponse> {
+        return postRepository.findAll(page).map { it.toResponse() }
     }
 }
